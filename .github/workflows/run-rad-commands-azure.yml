@@ -114,7 +114,7 @@ jobs:
             --file "$RADIUS_TARGET_KUBECONFIG"
 
       - name: Set up control plane
-        uses: radius-project/ai-extensions/.github/extension/actions/setup-control-plane@f89e730f441063ff26adbd9006296fc111134da7
+        uses: radius-project/ai-extensions/.github/extension/actions/setup-control-plane@618f195cc2f78cf25f24a79fbd267d0d8027a14e
 
       - name: Load Radius contrib catalog
         uses: radius-project/ai-extensions/.github/extension/actions/load-contrib-catalog@f89e730f441063ff26adbd9006296fc111134da7
