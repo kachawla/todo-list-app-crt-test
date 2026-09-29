@@ -1,4 +1,5 @@
 const db = require('../persistence');
+const { notify } = require('../notifications/email');
 
 module.exports = async (req, res) => {
     await db.updateItem(req.params.id, {
@@ -7,4 +8,5 @@ module.exports = async (req, res) => {
     });
     const item = await db.getItem(req.params.id);
     res.send(item);
+    notify('updated', item);
 };
