@@ -106,6 +106,17 @@ resource todoContainer 'Radius.Compute/containers@2025-08-01-preview' = {
       todo: {
         image: todoImage.properties.imageReference
         env: {
+          CONNECTION_EMAIL_CONNECTIONSTRING: {
+            valueFrom: {
+              secretKeyRef: {
+                key: 'connectionString'
+                secretName: emailService.properties.secrets.name
+              }
+            }
+          }
+          CONNECTION_EMAIL_SENDERADDRESS: {
+            value: emailService.properties.senderAddress
+          }
           MYSQL_DB: {
             value: 'todos'
           }
@@ -139,6 +150,7 @@ resource todoContainer 'Radius.Compute/containers@2025-08-01-preview' = {
     }
     connections: {
       email: {
+        disableDefaultEnvVars: true
         source: emailService.id
       }
     }
