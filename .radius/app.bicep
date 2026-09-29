@@ -25,10 +25,10 @@ resource mysqlDb 'Radius.Data/mySqlDatabases@2025-08-01-preview' = {
   properties: {
     environment: environment
     application: todoApp.id
-    codeReference: 'src/persistence/mysql.js#L31'
+    codeReference: 'src/persistence/mysql.js#L32'
     database: 'todos'
     password: mysqlPassword
-    tls: 'optional'
+    tls: 'required'
     username: 'myadmin'
     version: '8.0'
   }
@@ -75,7 +75,7 @@ resource todoImage 'Radius.Compute/containerImages@2025-08-01-preview' = {
       platforms: [
         'linux/amd64'
       ]
-      source: 'git::https://github.com/kachawla/todo-list-app-crt-test.git?ref=5a6fbf5caf982f1d928fe6c1c32aa74f1e95e063'
+      source: 'git::https://github.com/kachawla/todo-list-app-crt-test.git?ref=64b5eb9a25e34b345d68cfbabda7b08909bfdeda'
     }
   }
   dependsOn: [
@@ -106,6 +106,9 @@ resource todoContainer 'Radius.Compute/containers@2025-08-01-preview' = {
                 secretName: mysqlClientCredentials.name
               }
             }
+          }
+          MYSQL_SSL: {
+            value: 'true'
           }
           MYSQL_USER: {
             value: 'myadmin'
