@@ -1,4 +1,5 @@
 const db = require('../persistence');
+const { notify } = require('../notifications/email');
 const {v4 : uuid} = require('uuid');
 
 module.exports = async (req, res) => {
@@ -10,4 +11,5 @@ module.exports = async (req, res) => {
 
     await db.storeItem(item);
     res.send(item);
+    notify('added', item);
 };
