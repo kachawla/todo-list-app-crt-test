@@ -1,0 +1,53 @@
+namespace: Radius.Resources
+types:
+  emailCommunicationServices:
+    description: |
+      The Radius.Resources/emailCommunicationServices Resource Type provisions
+      Azure Communication Services with an Email Communication Services
+      Azure-managed domain linked to it, for sending transactional email.
+      ```bicep
+      resource email 'Radius.Resources/emailCommunicationServices@2025-08-01-preview' = {
+        name: 'email'
+        properties: {
+          environment: environment
+          application: myApplication.id
+        }
+      }
+      ```
+
+      Connect a container with a connection named `email` to receive
+      CONNECTION_EMAIL_SENDERADDRESS and CONNECTION_EMAIL_CONNECTIONSTRING
+      (secret-backed) on compatible Kubernetes Container Recipes.
+    apiVersions:
+      '2025-08-01-preview':
+        schema:
+          type: object
+          properties:
+            environment:
+              type: string
+              description: "(Required) The Radius Environment ID. Typically set by the rad CLI."
+            application:
+              type: string
+              description: "(Optional) The Radius Application ID."
+            codeReference:
+              type: string
+              description: "(Optional) Worktree-relative path or exact GitHub branch/file URL for graph source navigation; metadata only, ignored by the recipe."
+            senderAddress:
+              type: string
+              readOnly: true
+              description: "The sender address (DoNotReply@<Azure-managed domain>) allowed to send from the linked email domain. Mapped from the recipe's output."
+            secrets:
+              type: object
+              readOnly: true
+              description: "(Read-only) Recipe secrets. The reserved `name` sub-property references the managed Radius.Security/secrets resource Radius materializes from the Recipe's `result.secrets`; the other sub-properties declare secret keys whose values are written only into that managed secret."
+              properties:
+                name:
+                  type: string
+                  readOnly: true
+                  description: "(Reserved) Name of the managed Radius.Security/secrets resource. Use as `secretName` in a container `secretKeyRef`."
+                connectionString:
+                  type: string
+                  readOnly: true
+                  x-radius-sensitive: true
+                  description: "The Azure Communication Services connection string (endpoint and access key). Delivered via the managed secret."
+          required: [environment]

@@ -1,9 +1,13 @@
 extension radius
+extension customTypes
 
 param environment string
 
 @secure()
 param mysqlPassword string
+
+@description('Recipient address for todo change email notifications. Supplied at deploy time.')
+param notificationEmailTo string
 
 @description('Password/token for the OCI registry the containerImages recipe pushes to (a GitHub token with write:packages for ghcr.io).')
 @secure()
@@ -34,6 +38,15 @@ resource mysqlDb 'Radius.Data/mySqlDatabases@2025-08-01-preview' = {
   }
 }
 
+resource emailService 'Radius.Resources/emailCommunicationServices@2025-08-01-preview' = {
+  name: 'email'
+  properties: {
+    environment: environment
+    application: todoApp.id
+    codeReference: 'src/notifications/email.js#L34'
+  }
+}
+
 resource mysqlClientCredentials 'Radius.Security/secrets@2025-08-01-preview' = {
   name: 'mysql-client-credentials'
   properties: {
@@ -53,7 +66,7 @@ resource registryCreds 'Radius.Security/secrets@2025-08-01-preview' = {
   properties: {
     environment: environment
     application: todoApp.id
-    codeReference: '.radius/app.bicep#L51'
+    codeReference: '.radius/app.bicep#L64'
     data: {
       password: {
         value: registryPassword
@@ -75,7 +88,7 @@ resource todoImage 'Radius.Compute/containerImages@2025-08-01-preview' = {
       platforms: [
         'linux/amd64'
       ]
-      source: 'git::https://github.com/kachawla/todo-list-app-crt-test.git?ref=64b5eb9a25e34b345d68cfbabda7b08909bfdeda'
+      source: 'git::https://github.com/kachawla/todo-list-app-crt-test.git?ref=bd187974ba28722ffbccf275a30cf17b0ba46fc5'
     }
   }
   dependsOn: [
@@ -113,12 +126,20 @@ resource todoContainer 'Radius.Compute/containers@2025-08-01-preview' = {
           MYSQL_USER: {
             value: 'myadmin'
           }
+          NOTIFICATION_EMAIL_TO: {
+            value: notificationEmailTo
+          }
         }
         ports: {
           web: {
             containerPort: 3000
           }
         }
+      }
+    }
+    connections: {
+      email: {
+        source: emailService.id
       }
     }
   }
